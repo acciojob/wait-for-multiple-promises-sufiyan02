@@ -1,41 +1,15 @@
-//your JS code here. If required.
- const outputTable = document.getElementById("output");
+document.addEventListener("DOMContentLoaded", () => {
+    const output = document.getElementById("output");
+    output.innerHTML = `<tr><td colspan="2">Loading...</td></tr>`;
 
-  // Initially display "Loading..." row
-  outputTable.innerHTML = `
-    <tr>
-      <td colspan="2" class="text-center">Loading...</td>
-    </tr>
-  `;
-
-  // Function to create a promise that resolves after a random delay between 1-3 seconds
-  function createPromise(index) {
-    const delay = Math.random() * 2 + 1; // Random delay between 1 and 3 seconds
-    return new Promise((resolve) => {
-      setTimeout(() => resolve({ name: `Promise ${index}`, time: delay.toFixed(3) }), delay * 1000);
-    });
-  }
-
-  // Create 3 promises
-  const promises = [createPromise(1), createPromise(2), createPromise(3)];
-
-  // Use Promise.all to wait for all promises to resolve
-  Promise.all(promises).then((results) => {
-    // Calculate total time (max of all times)
-    const totalTime = Math.max(...results.map((res) => parseFloat(res.time))).toFixed(3);
-    
-    // Clear the loading row
-    outputTable.innerHTML = "";
-
-    // Populate the table with results
-    results.forEach((result) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `<td>${result.name}</td><td>${result.time}</td>`;
-      outputTable.appendChild(row);
+    const createPromise = (num) => new Promise(resolve => {
+        const time = (Math.random() * 2 + 1).toFixed(3);
+        setTimeout(() => resolve({ name: `Promise ${num}`, time }), time * 1000);
     });
 
-    // Append the total time row
-    const totalRow = document.createElement("tr");
-    totalRow.innerHTML = `<td>Total</td><td>${totalTime}</td>`;
-    outputTable.appendChild(totalRow);
-  });
+    Promise.all([createPromise(1), createPromise(2), createPromise(3)]).then(results => {
+        output.innerHTML = results.map(({ name, time }) => `<tr><td>${name}</td><td>${time}</td></tr>`).join("");
+        const totalTime = Math.max(...results.map(r => r.time));
+        output.innerHTML += `<tr><td>Total</td><td>${totalTime}</td></tr>`;
+    });
+});
